@@ -1,3 +1,6 @@
+if __name__ == '__main__':
+    app.run(debug=True)
+
 import csv
 from flask import Response
 
