@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Irradiance Simulation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        h1 {
+            color: #333;
+        }
+        label {
+            font-size: 1rem;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 1rem;
+        }
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Solar Irradiance Data Input</h1>
+    
+    <!-- Form to collect place and year -->
+    <form id="irradianceForm">
+        <label for="place">Enter Place: </label>
+        <input type="text" id="place" name="place" required><br><br>
+
+        <label for="year">Enter Year: </label>
+        <input type="text" id="year" name="year" required><br><br>
+
+        <button type="submit">Get Solar Data</button>
+    </form>
+    
+    <div id="result">
+        <!-- Results will appear here -->
+    </div>
+
+    <script>
+        // Handle form submission and send data to Flask API
+        document.getElementById('irradianceForm').addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent the default form submission behavior
+            
+            const place = document.getElementById('place').value;
+            const year = document.getElementById('year').value;
+
+            // Send request to Flask API
+            fetch(`/get_solar_irradiance?place=${place}&year=${year}`)
+                .then(response => response.json())  // Convert the response to JSON
+                .then(data => {
+                    const resultDiv = document.getElementById('result');
+                    resultDiv.innerHTML = "<h2>Solar Irradiance Data</h2>";
+                    if (data.error) {
+                        resultDiv.innerHTML += `<p>Error: ${data.error}</p>`;
+                    } else {
+                        // Display the data as a table
+                        let table = "<table border='1'><tr><th>Time</th><th>Irradiance (W/m²)</th></tr>";
+                        data.forEach(item => {
+                            table += `<tr><td>${item.time}</td><td>${item.irradiance}</td></tr>`;
+                        });
+                        table += "</table>";
+                        resultDiv.innerHTML += table;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Failed to fetch data from server.');
+                });
+        });
+    </script>
+</body>
+</html>
